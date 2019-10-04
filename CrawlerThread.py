@@ -76,7 +76,10 @@ class MyThread(threading.Thread):
 def get_manga( url):
     global url_queue, bar, threads, manga_name
     start_time = time.time()
+    print("解析网页...")
+    parseBar = progressbar.ProgressBar(max_value=30)
     r = requests.get(url, headers=headers, proxies=proxies)
+    parseBar.update(1)
     html = etree.HTML(r.text)
     res = html.xpath("//p[@class='gpc']/text()")[0]
     res = res.split()[-2]
@@ -95,6 +98,9 @@ def get_manga( url):
     for index in range(1, int(max_page)):
         page_url = url + "?p=" + str(index)
         url_queue.put((page_url, "page"))
+        parseBar.update(1 + index)
+    parseBar.finish()
+    print("下载图片...")
     for i in range(threads_num):
         thread = MyThread(manga_name)
         thread.start()
@@ -103,11 +109,15 @@ def get_manga( url):
         thread.join()
     time.sleep(3)
     # 将下载下来的文件打包为一个压缩包
+    print("正在打包文件...")
+    zipBar = progressbar.ProgressBar(max_value=number_of_images+1)
     zf = zipfile.ZipFile(local_path + "/" + manga_name + ".zip", 'w', zipfile.zlib.DEFLATED)
-    for file in os.listdir(local_path + "/" + manga_name):
+    for k, file in enumerate(os.listdir(local_path + "/" + manga_name)):
         file_path = local_path + "/" + manga_name + "/" + file
         zf.write(file_path, file)
+        zipBar.update(k + 1)
     zf.close()
+    zipBar.finish()
     end_time = time.time()
     dur_time = int(end_time - start_time)
     print("共" + str(number_of_images) + "张图片，耗时" + str(dur_time) + "秒")
