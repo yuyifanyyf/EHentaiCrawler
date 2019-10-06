@@ -1,5 +1,5 @@
 import sys
-import CrawlerThread as CrawlerThread
+import CrawlerThread
 import getopt
 
 

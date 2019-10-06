@@ -7,6 +7,7 @@ import time
 import progressbar
 import os
 import zipfile
+from Rotation import RotationThread
 
 url_queue = queue.Queue()
 threads = []
@@ -26,9 +27,10 @@ threads_num = cgf.getint("connection", "threads_num")
 
 
 class MyThread(threading.Thread):
-    def __init__(self, name):
+    def __init__(self, name, rotation):
         super(MyThread, self).__init__()  # 调用父类的构造函数
         self.name = name
+        self.rotation = rotation
 
     def run(self):
         global url_queue
@@ -69,19 +71,21 @@ class MyThread(threading.Thread):
         f.close()
         lock.acquire()
         count += 1
+        if count == 1:
+            self.rotation.stop()
         bar.update(count)
         lock.release()
 
 
-def get_manga( url):
+def get_manga(url):
     global url_queue, bar, threads, manga_name
     start_time = time.time()
-    print("解析网页...")
-    parseBar = progressbar.ProgressBar(max_value=30)
+    rotation_thread = RotationThread("rotation", "解析网页...")
+    rotation_thread.start()
     r = requests.get(url, headers=headers, proxies=proxies)
-    parseBar.update(1)
     html = etree.HTML(r.text)
-    res = html.xpath("//p[@class='gpc']/text()")[0]
+    tmp = html.xpath("//p[@class='gpc']/text()")
+    res = tmp[0]
     res = res.split()[-2]
     res = res.replace(",", "")  # 去掉数字里面的逗号
     number_of_images = int(res)  # 漫画共有多少张图片
@@ -98,16 +102,17 @@ def get_manga( url):
     for index in range(1, int(max_page)):
         page_url = url + "?p=" + str(index)
         url_queue.put((page_url, "page"))
-        parseBar.update(1 + index)
-    parseBar.finish()
-    print("下载图片...")
+
+    rotation_thread.stop()
+    rotation_thread = RotationThread("rotation", "下载图片...")
+    rotation_thread.start()
     for i in range(threads_num):
-        thread = MyThread(manga_name)
+        thread = MyThread(manga_name, rotation_thread)
         thread.start()
         threads.append(thread)
     for thread in threads:
         thread.join()
-    time.sleep(3)
+    # time.sleep(3)
     # 将下载下来的文件打包为一个压缩包
     print("正在打包文件...")
     zipBar = progressbar.ProgressBar(max_value=number_of_images+1)
