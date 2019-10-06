@@ -1,0 +1,5 @@
+一个e-hentai的爬虫脚本
+python main.py <url> -n <manga_name> -p <local_path>
+url:漫画地址
+manga_name:指定漫画下载目录名字，否则会生成默认名字
+local_path:指定漫画下载的路径
