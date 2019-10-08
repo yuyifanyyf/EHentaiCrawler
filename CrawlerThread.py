@@ -102,7 +102,6 @@ def get_manga(url):
     for index in range(1, int(max_page)):
         page_url = url + "?p=" + str(index)
         url_queue.put((page_url, "page"))
-
     rotation_thread.stop()
     rotation_thread = RotationThread("rotation", "下载图片...")
     rotation_thread.start()
@@ -114,15 +113,16 @@ def get_manga(url):
         thread.join()
     # time.sleep(3)
     # 将下载下来的文件打包为一个压缩包
-    print("正在打包文件...")
-    zipBar = progressbar.ProgressBar(max_value=number_of_images+1)
+    rotation_thread = RotationThread("rotation", "正在打包文件...")
+    print()
+    rotation_thread.start()
     zf = zipfile.ZipFile(local_path + "/" + manga_name + ".zip", 'w', zipfile.zlib.DEFLATED)
     for k, file in enumerate(os.listdir(local_path + "/" + manga_name)):
         file_path = local_path + "/" + manga_name + "/" + file
         zf.write(file_path, file)
-        zipBar.update(k + 1)
     zf.close()
-    zipBar.finish()
+    rotation_thread.stop()
+    rotation_thread.join()
     end_time = time.time()
     dur_time = int(end_time - start_time)
     print("共" + str(number_of_images) + "张图片，耗时" + str(dur_time) + "秒")
