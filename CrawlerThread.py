@@ -7,13 +7,14 @@ import time
 import progressbar
 import os
 import zipfile
-from Rotation import RotationThread
+from EHentaiCrawler.Rotation import RotationThread
 
+ehentai_path = os.environ["EHENTAIPATH"] #这里要手动配置EHENTAIPATH环境变量，即EHentaiCrawler的路径
 url_queue = queue.Queue()
 threads = []
 manga_name = ""
 cgf = ConfigParser()
-cgf.read("crawler.conf")
+cgf.read(ehentai_path + "/crawler.conf")
 proxies = dict()
 proxies["http"] = cgf.get("connection", "http")
 proxies["https"] = cgf.get("connection", "https")

@@ -1,5 +1,5 @@
 import sys
-import CrawlerThread
+from EHentaiCrawler import CrawlerThread
 import getopt
 
 
