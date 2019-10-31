@@ -1,5 +1,6 @@
 import sys
-from EHentaiCrawler import CrawlerThread
+from EHentaiCrawler import MyThread
+from EHentaiCrawler import init
 import getopt
 
 
@@ -12,8 +13,8 @@ if __name__ == "__main__":
         sys.exit(2)
     for opt, arg in opts:
         if opt == "-n":
-            CrawlerThread.manga_name = arg
+            init.manga_name = arg
         if opt == "-p":
-            CrawlerThread.local_path = arg
-    CrawlerThread.get_manga(url)
+            init.local_path = arg
+    MyThread.get_manga(url)
     print("complete.")
