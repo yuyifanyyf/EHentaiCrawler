@@ -1,10 +1,11 @@
-import os
 import threading
 from configparser import ConfigParser
 import queue
+import sys
 
 
-ehentai_path = os.environ["EHENTAIPATH"]  # 这里要手动配置EHENTAIPATH环境变量，即EHentaiCrawler的路径
+ehentai_path = sys.path[0] #获取EHentaiCrawler的路径
+#ehentai_path = os.environ["EHENTAIPATH"]  # 这里要手动配置EHENTAIPATH环境变量，即EHentaiCrawler的路径
 cgf = ConfigParser()
 cgf.read(ehentai_path + "/crawler.conf")
 proxies = dict()

@@ -1,7 +1,13 @@
 # EHentaiCrawler
 一个简单的漫画下载工具，目前支持ehentai和nhentai
 ## 用法
-需要配置环境变量``EHENTAIPATH``，值为项目目录的路径
+安装
+```
+git clone git@github.com:yuyifanyyf/EHentaiCrawler.git
+cd EHentaiCrawler
+pip install -r requirements.txt
+```
+使用示例
 ```
 python main.py <url> -n <manga_name> -p <local_path>
 url: 漫画地址
